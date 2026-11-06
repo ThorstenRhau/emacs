@@ -4,6 +4,7 @@
 ;; Minibuffer: built-in `fido-vertical-mode' (fuzzy, vertical list).
 ;; In-buffer: Corfu popup, which uses Emacs 31's terminal child frames,
 ;; with documentation beside the candidates.  Eglot feeds it LSP items.
+;; Snippets: yasnippet.
 
 ;;; Code:
 
@@ -26,6 +27,17 @@
   :init
   (global-corfu-mode)
   (corfu-popupinfo-mode))
+
+;; Own snippets live in snippets/<major-mode>/ in this directory, next
+;; to the yasnippet-snippets collection.  TAB expands a snippet key and
+;; moves between fields; C-c & holds the snippet commands.  Eglot
+;; expands LSP snippet completions with it.
+(use-package yasnippet
+  :init
+  (yas-global-mode 1))
+
+(use-package yasnippet-snippets
+  :after yasnippet)
 
 (provide 'init-completion)
 ;;; init-completion.el ends here

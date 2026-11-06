@@ -1,7 +1,7 @@
 # emacs
 
 Personal Emacs 31.1 configuration for macOS, used in the Ghostty terminal.
-Vanilla Emacs keys, built-in features first, four packages.
+Vanilla Emacs keys, built-in features first, seven packages.
 
 ## Installation
 
@@ -31,17 +31,22 @@ Ghostty must send Option as Meta (`macos-option-as-alt = left`).
 | `user-lisp/init-editor.el`     | Editing defaults, line numbers, backups, history              |
 | `user-lisp/init-terminal.el`   | xterm extensions that Ghostty supports                        |
 | `user-lisp/init-theme.el`      | Token Meridian, switched by the terminal's appearance reports |
-| `user-lisp/init-completion.el` | `fido-vertical-mode` and Corfu                                |
+| `user-lisp/init-completion.el` | `fido-vertical-mode`, Corfu and yasnippet                     |
 | `user-lisp/init-lsp.el`        | Tree-sitter modes, Eglot, Flymake, formatting                 |
-| `user-lisp/init-navigation.el` | project.el, Dired, ripgrep, recentf, which-key                |
+| `user-lisp/init-navigation.el` | project.el, Consult, Dired, ripgrep, recentf, which-key       |
 | `user-lisp/init-git.el`        | Magit and diff-hl                                             |
 
 Emacs 31 byte-compiles `user-lisp/` at startup, before it loads `init.el`, and
 recompiles files that changed. After upgrading Emacs, run
 `C-u M-x prepare-user-lisp` and restart.
 
-Packages: `token` (from its Git repository), `corfu`, `magit`, `diff-hl`, and
-Magit's dependencies.
+Packages: `token` (from its Git repository), `consult`, `corfu`, `yasnippet`,
+`yasnippet-snippets`, `magit`, `diff-hl`, and Magit's dependencies.
+
+Consult remaps the standard keys `C-x b`, `C-x 4 b`, `C-x p b`, `C-x r b`,
+`M-y`, `M-g g` and `M-g i` to its versions with live preview, and xref lists
+results through it. `yasnippet-snippets` supplies snippets for most languages;
+put your own in `snippets/<major-mode>/`. `TAB` expands them.
 
 ## Keys
 
@@ -57,6 +62,11 @@ Standard Emacs keys, plus these under the user prefix `C-c`:
 | `C-c c d`    | Buffer diagnostics           |
 | `C-c c D`    | Project diagnostics          |
 | `C-c f r`    | Recent files                 |
+| `C-c s l`    | Search lines in buffer       |
+| `C-c s r`    | Ripgrep in project           |
+| `C-c s o`    | Jump to outline heading      |
+| `C-c s i`    | Imenu across project buffers |
+| `C-c &`      | Snippet commands (yasnippet) |
 | `C-c o`      | Open file in its macOS app   |
 | `C-c t w`    | Toggle word wrap             |
 | `C-c t l`    | Toggle line numbers          |

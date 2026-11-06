@@ -5,8 +5,9 @@ has the install steps, module table and key bindings.
 
 ## Conventions
 
-- Vanilla Emacs keys, built-in features first. Four packages: `token`, `corfu`,
-  `magit`, `diff-hl`. Ask before adding one.
+- Vanilla Emacs keys, built-in features first. Seven packages: `token`, `consult`,
+  `corfu`, `yasnippet`, `yasnippet-snippets`, `magit`, `diff-hl`. Ask
+  before adding one.
 - Modules live in `user-lisp/init-*.el` and are required in order from
   `init.el`. A new module needs a `require` there and a row in the README
   layout table.

@@ -1,9 +1,9 @@
 ;;; init-navigation.el --- Files, projects, search and key hints -*- lexical-binding: t -*-
 
 ;;; Commentary:
-;; Built-in replacements for fzf-lua, oil.nvim and mini.clue:
-;; project.el for files and grep, Dired for directories, recentf for
-;; recent files and which-key for key hints.
+;; project.el for files and grep, Consult for search with live preview,
+;; Dired for directories, recentf for recent files and which-key for
+;; key hints.
 
 ;;; Code:
 
@@ -11,7 +11,25 @@
 (setopt xref-search-program 'ripgrep
         grep-use-headings t)
 
-(keymap-global-set "C-c f r" #'recentf-open)
+;; Consult takes over the standard keys through remaps, so C-x b,
+;; C-x p b, M-y, M-g g and M-g i keep working with preview.  Search
+;; commands that have no standard key go under C-c s.
+(use-package consult
+  :bind (([remap switch-to-buffer] . consult-buffer)
+         ([remap switch-to-buffer-other-window] . consult-buffer-other-window)
+         ([remap project-switch-to-buffer] . consult-project-buffer)
+         ([remap bookmark-jump] . consult-bookmark)
+         ([remap yank-pop] . consult-yank-pop)
+         ([remap goto-line] . consult-goto-line)
+         ([remap imenu] . consult-imenu)
+         ("C-c f r" . consult-recent-file)
+         ("C-c s l" . consult-line)
+         ("C-c s r" . consult-ripgrep)
+         ("C-c s o" . consult-outline)
+         ("C-c s i" . consult-imenu-multi))
+  :custom
+  (xref-show-xrefs-function #'consult-xref)
+  (xref-show-definitions-function #'consult-xref))
 
 ;; Dired: GNU ls from coreutils with directories first, else macOS ls.
 ;; Deletions move to the macOS Trash.  C-x C-j jumps to the current

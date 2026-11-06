@@ -25,16 +25,16 @@ Ghostty must send Option as Meta (`macos-option-as-alt = left`).
 
 ## Layout
 
-| File | Purpose |
-| --- | --- |
-| `init.el` | Custom file, module order |
-| `user-lisp/init-editor.el` | Editing defaults, line numbers, backups, history |
-| `user-lisp/init-terminal.el` | xterm extensions that Ghostty supports |
-| `user-lisp/init-theme.el` | Token Meridian, switched by the terminal's appearance reports |
-| `user-lisp/init-completion.el` | `fido-vertical-mode` and Corfu |
-| `user-lisp/init-lsp.el` | Tree-sitter modes, Eglot, Flymake, formatting |
-| `user-lisp/init-navigation.el` | project.el, Dired, ripgrep, recentf, which-key |
-| `user-lisp/init-git.el` | Magit and diff-hl |
+| File                           | Purpose                                                       |
+| ------------------------------ | ------------------------------------------------------------- |
+| `init.el`                      | Custom file, module order                                     |
+| `user-lisp/init-editor.el`     | Editing defaults, line numbers, backups, history              |
+| `user-lisp/init-terminal.el`   | xterm extensions that Ghostty supports                        |
+| `user-lisp/init-theme.el`      | Token Meridian, switched by the terminal's appearance reports |
+| `user-lisp/init-completion.el` | `fido-vertical-mode` and Corfu                                |
+| `user-lisp/init-lsp.el`        | Tree-sitter modes, Eglot, Flymake, formatting                 |
+| `user-lisp/init-navigation.el` | project.el, Dired, ripgrep, recentf, which-key                |
+| `user-lisp/init-git.el`        | Magit and diff-hl                                             |
 
 Emacs 31 byte-compiles `user-lisp/` at startup, before it loads `init.el`, and
 recompiles files that changed. After upgrading Emacs, run
@@ -47,17 +47,17 @@ Magit's dependencies.
 
 Standard Emacs keys, plus these under the user prefix `C-c`:
 
-| Key | Command |
-| --- | --- |
-| `C-c c a` | Code action |
-| `C-c c r` | Rename symbol |
-| `C-c c i` | Find implementation |
-| `C-c c t` | Find type definition |
-| `C-c c f` | Format buffer |
-| `C-c c d` | Buffer diagnostics |
-| `C-c c D` | Project diagnostics |
-| `C-c f r` | Recent files |
-| `C-c o` | Open file in its macOS app |
-| `C-c t w` | Toggle word wrap |
-| `C-c t l` | Toggle line numbers |
+| Key          | Command                      |
+| ------------ | ---------------------------- |
+| `C-c c a`    | Code action                  |
+| `C-c c r`    | Rename symbol                |
+| `C-c c i`    | Find implementation          |
+| `C-c c t`    | Find type definition         |
+| `C-c c f`    | Format buffer                |
+| `C-c c d`    | Buffer diagnostics           |
+| `C-c c D`    | Project diagnostics          |
+| `C-c f r`    | Recent files                 |
+| `C-c o`      | Open file in its macOS app   |
+| `C-c t w`    | Toggle word wrap             |
+| `C-c t l`    | Toggle line numbers          |
 | `M-n`, `M-p` | Next and previous diagnostic |

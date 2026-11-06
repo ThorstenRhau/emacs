@@ -44,6 +44,12 @@
         wdired-allow-to-change-permissions t)
 
 (which-key-mode 1)
+(which-key-add-key-based-replacements
+  "C-c @" "fold"
+  "C-c c" "code"
+  "C-c f" "files"
+  "C-c s" "search"
+  "C-c t" "toggle")
 
 (provide 'init-navigation)
 ;;; init-navigation.el ends here

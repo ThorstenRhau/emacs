@@ -1,0 +1,16 @@
+# Installed packages and grammars
+/elpa/
+/eln-cache/
+/tree-sitter/
+
+# Runtime state
+/auto-save/
+/auto-save-list/
+/backups/
+/transient/
+/url/
+/custom.el
+/history
+/*.eld
+*.elc
+/user-lisp/.user-lisp-autoloads.el

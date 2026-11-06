@@ -15,7 +15,8 @@
 ;; Emacs compiles user-lisp/ before this file runs, and use-package
 ;; installs packages while compiling those keywords.  A Git install
 ;; started that way fails and leaves the package broken.
-(setopt package-selected-packages '(consult corfu diff-hl magit yasnippet yasnippet-snippets)
+(setopt package-selected-packages
+        '(consult corfu diff-hl magit orderless vertico yasnippet yasnippet-snippets)
         package-vc-selected-packages
         '((token :url "https://github.com/ThorstenRhau/token"
                  :lisp-dir "contrib/emacs")))

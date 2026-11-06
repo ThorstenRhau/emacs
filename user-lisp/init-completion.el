@@ -1,14 +1,21 @@
 ;;; init-completion.el --- Minibuffer and in-buffer completion -*- lexical-binding: t -*-
 
 ;;; Commentary:
-;; Minibuffer: built-in `fido-vertical-mode' (fuzzy, vertical list).
+;; Minibuffer: Vertico lists the candidates vertically, and Orderless
+;; matches space-separated parts in any order, like fzf.
 ;; In-buffer: Corfu popup, which uses Emacs 31's terminal child frames,
 ;; with documentation beside the candidates.  Eglot feeds it LSP items.
 ;; Snippets: yasnippet.
 
 ;;; Code:
 
-(setopt completion-styles '(basic partial-completion flex)
+;; Loaded first: `setopt' checks `completion-styles' against the
+;; styles that are defined.
+(use-package orderless)
+
+;; File names keep partial-completion, so ~/.c/em expands to ~/.config/emacs.
+(setopt completion-styles '(orderless basic)
+        completion-category-overrides '((file (styles basic partial-completion)))
         completion-ignore-case t
         read-buffer-completion-ignore-case t
         read-file-name-completion-ignore-case t
@@ -16,7 +23,11 @@
         enable-recursive-minibuffers t
         tab-always-indent 'complete)           ; TAB indents, then completes
 
-(fido-vertical-mode 1)
+(use-package vertico
+  :custom
+  (vertico-cycle t)
+  :init
+  (vertico-mode))
 
 (use-package corfu
   :custom

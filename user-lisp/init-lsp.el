@@ -3,9 +3,11 @@
 ;;; Commentary:
 ;; Tree-sitter modes for all supported languages, grammars installed on
 ;; first use.  Eglot starts the Homebrew language servers that Eglot
-;; already knows about.  Flymake shows their diagnostics, and next to
-;; them the same linters as nvim-lint.  C-c c f runs the same
-;; formatters as conform.nvim.
+;; already knows about, and for Python basedpyright and ruff together
+;; through rass.  JSON files are checked against the SchemaStore
+;; schemas.  Flymake shows the diagnostics, and next to them the same
+;; linters as nvim-lint.  C-c c f runs the same formatters as
+;; conform.nvim.
 
 ;;; Code:
 
@@ -17,6 +19,65 @@
 ;; it or associate it with .md files.
 (autoload 'markdown-ts-mode "markdown-ts-mode" nil t)
 (add-to-list 'auto-mode-alist '("\\.md\\'" . markdown-ts-mode))
+
+(defvar my-json-schemas-file (locate-user-emacs-file "schemastore.json")
+  "Local copy of the SchemaStore catalog.")
+
+(defvar my-json-schemas nil
+  "Schema associations read from `my-json-schemas-file', once per session.")
+
+(defun my-json-schemas-update ()
+  "Download the SchemaStore catalog to `my-json-schemas-file'.
+The old copy is kept unless the new one downloads and parses."
+  (interactive)
+  (let ((temp (make-temp-file "schemastore" nil ".json")))
+    (unwind-protect
+        (progn
+          (url-copy-file "https://www.schemastore.org/api/json/catalog.json" temp t)
+          (with-temp-buffer
+            (insert-file-contents temp)
+            (json-parse-buffer))        ; signals unless it is JSON
+          (rename-file temp my-json-schemas-file t)
+          (setq my-json-schemas nil)
+          (message "SchemaStore catalog updated"))
+      (when (file-exists-p temp)
+        (delete-file temp)))))
+
+(defun my-json-schemas ()
+  "Return the SchemaStore schemas as vscode-json-languageserver settings.
+Without the catalog, return no schemas, so only files with a $schema
+key are validated.  Reading it takes a few milliseconds."
+  (or my-json-schemas
+      (setq my-json-schemas
+            (or (with-demoted-errors "SchemaStore catalog unreadable: %S"
+                  (when (file-exists-p my-json-schemas-file)
+                    (with-temp-buffer
+                      (insert-file-contents my-json-schemas-file)
+                      (vconcat
+                       (seq-keep (lambda (schema)
+                                   (when-let* ((files (plist-get schema :fileMatch)))
+                                     (list :fileMatch files :url (plist-get schema :url))))
+                                 (plist-get (json-parse-buffer :object-type 'plist)
+                                            :schemas))))))
+                []))))
+
+(defun my-json-schemas-ensure ()
+  "Download the SchemaStore catalog if it is missing.
+Runs when a JSON file opens, before Eglot starts its server."
+  (unless (file-exists-p my-json-schemas-file)
+    (with-demoted-errors "SchemaStore catalog download failed: %S"
+      (my-json-schemas-update))))
+
+(add-hook 'json-ts-mode-hook #'my-json-schemas-ensure)
+
+(declare-function eglot-alternatives "eglot")
+
+(defun my-eglot-workspace-configuration (_server)
+  "Return the settings that Eglot sends to every language server.
+basedpyright leaves organizing imports to ruff, as in the Neovim setup."
+  `(:basedpyright (:disableOrganizeImports t
+                   :analysis (:typeCheckingMode "standard"))
+    :json (:schemas ,(my-json-schemas) :validate (:enable t))))
 
 (use-package eglot
   :hook ((bash-ts-mode
@@ -36,15 +97,21 @@
   (eglot-events-buffer-config '(:size 0 :format full)) ; no event log
   :config
   ;; A buffer-local defvar, not a defcustom, so :custom does not set it.
-  (setq-default eglot-workspace-configuration
-                '(:basedpyright (:analysis (:typeCheckingMode "standard"))))
+  (setq-default eglot-workspace-configuration #'my-eglot-workspace-configuration)
   ;; basedpyright asks to watch the Python stdlib and site-packages too.
   ;; kqueue needs one file descriptor per directory, so Emacs runs out
   ;; and the server exits.  Watch the project only.
   (setq eglot-watch-files-outside-project-root nil)
   ;; Eglot's own table maps marksman to markdown-mode only.
   (add-to-list 'eglot-server-programs
-               '(markdown-ts-mode . ("marksman" "server"))))
+               '(markdown-ts-mode . ("marksman" "server")))
+  ;; rass runs basedpyright and ruff behind one connection, so ruff's
+  ;; diagnostics and code actions work next to basedpyright's.  Eglot's
+  ;; own table asks for rass's python preset, which runs ty instead.
+  (add-to-list 'eglot-server-programs
+               `((python-mode python-ts-mode)
+                 . ,(eglot-alternatives '(("rass" "basedruff")
+                                          ("basedpyright-langserver" "--stdio"))))))
 
 ;; The most severe diagnostic of a line also shows at its end.
 ;; The indicators go in the right margin, because diff-hl uses the
@@ -115,13 +182,11 @@ changed only if the formatter succeeds."
 (keymap-global-set "C-c c f" #'my-format-buffer)
 
 (defvar my-linters
-  '((python-ts-mode   "ruff" "check" "--output-format" "concise" "--quiet"
-                      "--stdin-filename" file "-")
-    (lua-ts-mode      "selene" "--display-style" "quiet" "-")
+  '((lua-ts-mode      "selene" "--display-style" "quiet" "-")
     (markdown-ts-mode "markdownlint" "--stdin")
     (yaml-ts-mode     "yamllint" "--format" "parsable" "-"))
   "Linter command per major mode, the same as in nvim-lint.
-Ruff is here because Eglot runs basedpyright, not the ruff server.
+Ruff is not here: it runs as a language server through rass.
 The command reads the buffer on stdin and prints one problem per line
 as FILE:LINE[:COL][:] MESSAGE.  A message that starts with `error' or
 `[error' is an error, any other a warning.  The symbol `file' stands

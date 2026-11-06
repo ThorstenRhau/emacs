@@ -114,11 +114,15 @@ Like Neovim's mksession!, the last Emacs to exit wins."
     (user-error "Buffer is not visiting a file"))
   (call-process "open" nil 0 nil buffer-file-name))
 
+(declare-function my-json-schemas-update "init-lsp")
+
 (defun my-package-upgrade-all ()
-  "Upgrade the packages from the archives and from Git."
+  "Upgrade the packages from the archives and from Git.
+Also refresh the SchemaStore catalog, as schemastore.nvim does."
   (interactive)
   (package-upgrade-all t)
-  (package-vc-upgrade-all))
+  (package-vc-upgrade-all)
+  (my-json-schemas-update))
 
 (keymap-global-set "C-c o" #'my-open-externally)
 (keymap-global-set "C-c c l" #'align-regexp)

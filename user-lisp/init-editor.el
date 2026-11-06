@@ -81,10 +81,21 @@
 ;; restores them, like the Neovim setup.
 (setopt desktop-path (list user-emacs-directory))
 
+(defvar desktop-file-modtime)
+(declare-function desktop-full-file-name "desktop")
+
 (defun my-desktop-save ()
-  "Save the session to `user-emacs-directory', except in batch mode."
+  "Save the session to `user-emacs-directory', except in batch mode.
+Like Neovim's mksession!, the last Emacs to exit wins."
   (unless noninteractive
-    (desktop-save user-emacs-directory t)))
+    (require 'desktop)
+    ;; `desktop-save' asks before it overwrites a session file that
+    ;; this Emacs did not load.  Claiming the file's current time as
+    ;; the loaded one skips that question.
+    (let ((desktop-file-modtime
+           (file-attribute-modification-time
+            (file-attributes (desktop-full-file-name user-emacs-directory)))))
+      (desktop-save user-emacs-directory t))))
 
 (add-hook 'kill-emacs-hook #'my-desktop-save)
 

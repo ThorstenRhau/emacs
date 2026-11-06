@@ -37,6 +37,10 @@
   ;; A buffer-local defvar, not a defcustom, so :custom does not set it.
   (setq-default eglot-workspace-configuration
                 '(:basedpyright (:analysis (:typeCheckingMode "standard"))))
+  ;; basedpyright asks to watch the Python stdlib and site-packages too.
+  ;; kqueue needs one file descriptor per directory, so Emacs runs out
+  ;; and the server exits.  Watch the project only.
+  (setq eglot-watch-files-outside-project-root nil)
   ;; Eglot's own table maps marksman to markdown-mode only.
   (add-to-list 'eglot-server-programs
                '(markdown-ts-mode . ("marksman" "server"))))

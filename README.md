@@ -1,7 +1,7 @@
 # emacs
 
 Personal Emacs 31.1 configuration for macOS, used in the Ghostty terminal.
-Vanilla Emacs keys, built-in features first, nine packages.
+Vanilla Emacs keys, built-in features first, ten packages.
 
 ## Installation
 
@@ -11,8 +11,13 @@ Install Emacs and the tools with [Homebrew](https://brew.sh/):
 brew install emacs git ripgrep coreutils aspell \
   basedpyright bash-language-server lua-language-server marksman \
   vscode-langservers-extracted yaml-language-server tombi \
-  ruff shfmt stylua prettier selene markdownlint-cli yamllint
+  ruff shfmt stylua prettier selene markdownlint-cli yamllint uv
+uv tool install rassumfrassum
 ```
+
+[rass](https://github.com/joaotavora/rassumfrassum) runs basedpyright and ruff
+behind one Eglot connection, so Python gets ruff's diagnostics and code actions
+too.
 
 Building tree-sitter grammars needs the Xcode Command Line Tools
 (`xcode-select --install`).
@@ -31,8 +36,8 @@ Ghostty must send Option as Meta (`macos-option-as-alt = left`).
 | `user-lisp/init-editor.el`     | Editing defaults, folding, spelling, sessions, backups        |
 | `user-lisp/init-terminal.el`   | xterm extensions that Ghostty supports                        |
 | `user-lisp/init-theme.el`      | Token Meridian, switched by the terminal's appearance reports |
-| `user-lisp/init-completion.el` | Vertico, Orderless, Corfu and yasnippet                       |
-| `user-lisp/init-lsp.el`        | Tree-sitter modes, Eglot, Flymake, linters, formatting        |
+| `user-lisp/init-completion.el` | Vertico, Orderless, Corfu, Cape and yasnippet                 |
+| `user-lisp/init-lsp.el`        | Tree-sitter modes, Eglot, JSON schemas, linters, formatting   |
 | `user-lisp/init-navigation.el` | project.el, Consult, Dired, ripgrep, recentf, which-key       |
 | `user-lisp/init-git.el`        | Magit and diff-hl                                             |
 
@@ -41,8 +46,8 @@ recompiles files that changed. After upgrading Emacs, run
 `C-u M-x prepare-user-lisp` and restart.
 
 Packages: `token` (from its Git repository), `vertico`, `orderless`, `consult`,
-`corfu`, `yasnippet`, `yasnippet-snippets`, `magit`, `diff-hl`, and Magit's
-dependencies.
+`corfu`, `cape`, `yasnippet`, `yasnippet-snippets`, `magit`, `diff-hl`, and
+Magit's dependencies.
 
 In the minibuffer, Orderless matches space-separated parts in any order. File
 names also expand partial paths, so `~/.c/em` finds `~/.config/emacs`.
@@ -52,10 +57,17 @@ Consult remaps the standard keys `C-x b`, `C-x 4 b`, `C-x p b`, `C-x r b`,
 results through it. `yasnippet-snippets` supplies snippets for most languages;
 put your own in `snippets/<major-mode>/`. `TAB` expands them.
 
-Flymake shows the language server's diagnostics and, for Python, Lua, Markdown
-and YAML, those of ruff, selene, markdownlint and yamllint. They show at the end
+In code, prose and config files, Corfu also completes file names once the text
+at point contains a `/`.
+
+Flymake shows the language server's diagnostics and, for Lua, Markdown and
+YAML, those of selene, markdownlint and yamllint. They show at the end
 of the line and in the right margin; diff-hl uses the left one. The linters run
 in the project root, where they find their configuration.
+
+JSON files are validated against the [SchemaStore](https://www.schemastore.org)
+schema that matches their name. The first JSON file you open downloads the
+catalog to `schemastore.json`; `C-c l` refreshes it.
 
 Open files and windows are saved on exit. `C-c S` restores them. With
 `repeat-mode`, keep pressing the last key of a command such as `C-x v ]` to
@@ -84,7 +96,7 @@ Standard Emacs keys, plus these under the user prefix `C-c`:
 | `C-c &`      | Snippet commands (yasnippet) |
 | `C-c o`      | Open file in its macOS app   |
 | `C-c S`      | Restore the last session     |
-| `C-c l`      | Upgrade all packages         |
+| `C-c l`      | Upgrade packages and schemas |
 | `C-c t s`    | Toggle spelling              |
 | `C-c t w`    | Toggle word wrap             |
 | `C-c t l`    | Toggle line numbers          |

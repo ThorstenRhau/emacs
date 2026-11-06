@@ -5,8 +5,8 @@ has the install steps, module table and key bindings.
 
 ## Conventions
 
-- Vanilla Emacs keys, built-in features first. Nine packages: `token`,
-  `vertico`, `orderless`, `consult`, `corfu`, `yasnippet`,
+- Vanilla Emacs keys, built-in features first. Ten packages: `token`,
+  `vertico`, `orderless`, `consult`, `corfu`, `cape`, `yasnippet`,
   `yasnippet-snippets`, `magit`, `diff-hl`. Ask before adding one.
 - Modules live in `user-lisp/init-*.el` and are required in order from
   `init.el`. A new module needs a `require` there and a row in the README
@@ -32,7 +32,8 @@ has the install steps, module table and key bindings.
 ## Gotchas
 
 - This directory is the live Emacs config. `elpa/`, `tree-sitter/`, `custom.el`,
-  `history`, `*.eld` and `*.elc` are generated and gitignored. Do not edit or
+  `history`, `schemastore.json`, `.emacs.desktop`, `*.eld` and `*.elc` are
+  generated and gitignored. Do not edit or
   commit them.
 - Customize output goes to `custom.el`, not `init.el`.
 - `init-terminal.el` sets `xterm-extra-capabilities` only when `TERM` is

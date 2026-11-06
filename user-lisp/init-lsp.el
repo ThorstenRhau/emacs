@@ -147,7 +147,7 @@ use to find their configuration.")
 (declare-function eglot-managed-p "eglot")
 
 (defun my-format-buffer ()
-  "Format the buffer with its command in `my-formatters'.
+  "Format the whole buffer, ignoring narrowing, with `my-formatters'.
 The buffer is changed only if the formatter succeeds."
   (interactive)
   (let* ((command (alist-get major-mode my-formatters))
@@ -157,16 +157,18 @@ The buffer is changed only if the formatter succeeds."
       (let ((output (generate-new-buffer " *format*"))
             (errors (make-temp-file "format-errors")))
         (unwind-protect
-            ;; The exit status is a string if the formatter was killed.
-            (if (eql 0 (apply #'call-process-region nil nil program nil
-                              (list output errors) nil
-                              (my-command-args command)))
-                ;; Keeps point, marks and undo history intact.
-                (replace-region-contents (point-min) (point-max) output)
-              (user-error "%s failed: %s" (car command)
-                          (with-temp-buffer
-                            (insert-file-contents errors)
-                            (string-trim (buffer-string)))))
+            (save-restriction
+              (widen)
+              ;; The exit status is a string if the formatter was killed.
+              (if (eql 0 (apply #'call-process-region nil nil program nil
+                                (list output errors) nil
+                                (my-command-args command)))
+                  ;; Keeps point, marks and undo history intact.
+                  (replace-region-contents (point-min) (point-max) output)
+                (user-error "%s failed: %s" (car command)
+                            (with-temp-buffer
+                              (insert-file-contents errors)
+                              (string-trim (buffer-string))))))
           (kill-buffer output)
           (delete-file errors))))
      (command (user-error "%s is not installed" (car command)))

@@ -9,7 +9,9 @@
 
 ;;; Code:
 
-(use-package magit)
+;; Magit's autoloads bind C-x g and C-c M-g; load the rest on first use.
+(use-package magit
+  :defer t)
 
 (use-package diff-hl
   :hook (magit-post-refresh . diff-hl-magit-post-refresh)

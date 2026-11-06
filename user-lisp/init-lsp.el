@@ -33,9 +33,10 @@
   :custom
   (eglot-autoshutdown t)
   (eglot-events-buffer-config '(:size 0 :format full)) ; no event log
-  (eglot-workspace-configuration
-   '(:basedpyright (:analysis (:typeCheckingMode "standard"))))
   :config
+  ;; A buffer-local defvar, not a defcustom, so :custom does not set it.
+  (setq-default eglot-workspace-configuration
+                '(:basedpyright (:analysis (:typeCheckingMode "standard"))))
   ;; Eglot's own table maps marksman to markdown-mode only.
   (add-to-list 'eglot-server-programs
                '(markdown-ts-mode . ("marksman" "server"))))

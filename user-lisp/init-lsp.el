@@ -3,8 +3,9 @@
 ;;; Commentary:
 ;; Tree-sitter modes for all supported languages, grammars installed on
 ;; first use.  Eglot starts the Homebrew language servers that Eglot
-;; already knows about.  Flymake shows their diagnostics.  C-c c f runs
-;; the same formatters as conform.nvim.
+;; already knows about.  Flymake shows their diagnostics, and next to
+;; them the same linters as nvim-lint.  C-c c f runs the same
+;; formatters as conform.nvim.
 
 ;;; Code:
 
@@ -45,7 +46,13 @@
   (add-to-list 'eglot-server-programs
                '(markdown-ts-mode . ("marksman" "server"))))
 
+;; The most severe diagnostic of a line also shows at its end.
+;; The indicators go in the right margin, because diff-hl uses the
+;; left one.
 (use-package flymake
+  :custom
+  (flymake-show-diagnostics-at-end-of-line 'short)
+  (flymake-margin-indicator-position 'right-margin)
   :bind (:map flymake-mode-map
          ("M-n" . flymake-goto-next-error)
          ("M-p" . flymake-goto-prev-error)
@@ -65,7 +72,13 @@ The command reads the buffer on stdin and writes the result to stdout.
 The symbol `file' stands for the buffer's file name, which formatters
 use to find their configuration.")
 
+(defun my-command-args (command)
+  "Return the arguments of COMMAND with `file' replaced by the file name."
+  (let ((file (or buffer-file-name (buffer-name))))
+    (mapcar (lambda (arg) (if (eq arg 'file) file arg)) (cdr command))))
+
 (declare-function eglot-format-buffer "eglot")
+(declare-function eglot-managed-p "eglot")
 
 (defun my-format-buffer ()
   "Format the buffer with its command in `my-formatters', else with Eglot.
@@ -77,15 +90,13 @@ changed only if the formatter succeeds."
          (eglot (and (fboundp 'eglot-managed-p) (eglot-managed-p))))
     (cond
      (program
-      (let ((file (or buffer-file-name (buffer-name)))
-            (output (generate-new-buffer " *format*"))
+      (let ((output (generate-new-buffer " *format*"))
             (errors (make-temp-file "format-errors")))
         (unwind-protect
             ;; The exit status is a string if the formatter was killed.
             (if (eql 0 (apply #'call-process-region nil nil program nil
                               (list output errors) nil
-                              (mapcar (lambda (arg) (if (eq arg 'file) file arg))
-                                      (cdr command))))
+                              (my-command-args command)))
                 ;; Keeps point, marks and undo history intact.
                 (replace-region-contents (point-min) (point-max) output)
               (user-error "%s failed: %s" (car command)
@@ -102,6 +113,88 @@ changed only if the formatter succeeds."
      (t (user-error "No formatter for %s" major-mode)))))
 
 (keymap-global-set "C-c c f" #'my-format-buffer)
+
+(defvar my-linters
+  '((python-ts-mode   "ruff" "check" "--output-format" "concise" "--quiet"
+                      "--stdin-filename" file "-")
+    (lua-ts-mode      "selene" "--display-style" "quiet" "-")
+    (markdown-ts-mode "markdownlint" "--stdin")
+    (yaml-ts-mode     "yamllint" "--format" "parsable" "-"))
+  "Linter command per major mode, the same as in nvim-lint.
+Ruff is here because Eglot runs basedpyright, not the ruff server.
+The command reads the buffer on stdin and prints one problem per line
+as FILE:LINE[:COL][:] MESSAGE.  A message that starts with `error' or
+`[error' is an error, any other a warning.  The symbol `file' stands
+for the buffer's file name.  The linter runs in the project root, where
+it finds its configuration.")
+
+(defvar-local my-lint--process nil
+  "The running linter process of this buffer.")
+
+(defun my-lint--diagnostics (source)
+  "Parse the linter output in the current buffer into SOURCE diagnostics."
+  (goto-char (point-min))
+  (let (diagnostics)
+    (while (re-search-forward
+            "^[^:\n]*:\\([0-9]+\\)\\(?::\\([0-9]+\\)\\)?:? \\(.+\\)$" nil t)
+      (let ((region (flymake-diag-region
+                     source (string-to-number (match-string 1))
+                     (and (match-string 2) (string-to-number (match-string 2)))))
+            (text (match-string 3)))
+        (when region
+          (push (flymake-make-diagnostic
+                 source (car region) (cdr region)
+                 (if (string-match-p "\\`\\[?error" text) :error :warning)
+                 text)
+                diagnostics))))
+    diagnostics))
+
+(defun my-lint-flymake (report-fn &rest _args)
+  "Flymake backend that runs the buffer's linter from `my-linters'.
+Calls REPORT-FN with the problems, or with `:panic' when the linter
+fails without reporting any."
+  (let ((command (alist-get major-mode my-linters))
+        (source (current-buffer))
+        (default-directory (if-let* ((project (project-current)))
+                               (project-root project)
+                             default-directory)))
+    (when (process-live-p my-lint--process)
+      (kill-process my-lint--process))
+    (setq my-lint--process
+          (make-process
+           :name "my-lint"
+           :noquery t
+           :connection-type 'pipe
+           :buffer (generate-new-buffer " *my-lint*") ; stderr too
+           :command (cons (car command) (my-command-args command))
+           :sentinel
+           (lambda (process _event)
+             (unless (process-live-p process)
+               (unwind-protect
+                   (when (and (buffer-live-p source)
+                              (eq process (buffer-local-value 'my-lint--process source)))
+                     (with-current-buffer (process-buffer process)
+                       (let ((diagnostics (my-lint--diagnostics source)))
+                         (if (or diagnostics (eql 0 (process-exit-status process)))
+                             (funcall report-fn diagnostics)
+                           (funcall report-fn :panic :explanation
+                                    (format "%s: %s" (car command)
+                                            (string-trim (buffer-string))))))))
+                 (kill-buffer (process-buffer process)))))))
+    (process-send-region my-lint--process (point-min) (point-max))
+    (process-send-eof my-lint--process)))
+
+(defun my-lint-setup ()
+  "Add the buffer's linter to Flymake next to Eglot's diagnostics.
+Eglot replaces the Flymake backends when it starts, so this runs from
+`eglot-managed-mode-hook'.  Every mode in `my-linters' uses Eglot."
+  (when-let* (((eglot-managed-p))
+              (command (alist-get major-mode my-linters)))
+    (if (executable-find (car command))
+        (add-hook 'flymake-diagnostic-functions #'my-lint-flymake nil t)
+      (message "%s is not installed, so this buffer is not linted" (car command)))))
+
+(add-hook 'eglot-managed-mode-hook #'my-lint-setup)
 
 (provide 'init-lsp)
 ;;; init-lsp.el ends here

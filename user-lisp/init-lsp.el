@@ -144,17 +144,14 @@ use to find their configuration.")
   (let ((file (or buffer-file-name (buffer-name))))
     (mapcar (lambda (arg) (if (eq arg 'file) file arg)) (cdr command))))
 
-(declare-function eglot-format-buffer "eglot")
 (declare-function eglot-managed-p "eglot")
 
 (defun my-format-buffer ()
-  "Format the buffer with its command in `my-formatters', else with Eglot.
-Eglot is also used when the formatter is not installed.  The buffer is
-changed only if the formatter succeeds."
+  "Format the buffer with its command in `my-formatters'.
+The buffer is changed only if the formatter succeeds."
   (interactive)
   (let* ((command (alist-get major-mode my-formatters))
-         (program (and command (executable-find (car command))))
-         (eglot (and (fboundp 'eglot-managed-p) (eglot-managed-p))))
+         (program (and command (executable-find (car command)))))
     (cond
      (program
       (let ((output (generate-new-buffer " *format*"))
@@ -172,10 +169,6 @@ changed only if the formatter succeeds."
                             (string-trim (buffer-string)))))
           (kill-buffer output)
           (delete-file errors))))
-     (eglot
-      (when command
-        (message "%s is not installed, formatting with Eglot" (car command)))
-      (eglot-format-buffer))
      (command (user-error "%s is not installed" (car command)))
      (t (user-error "No formatter for %s" major-mode)))))
 

@@ -73,9 +73,7 @@
           (lambda ()
             (setq fill-column 72)
             (display-fill-column-indicator-mode 1)
-            (if (executable-find "aspell")
-                (flyspell-mode 1)
-              (message "aspell is not installed, so spelling is off"))))
+            (flyspell-mode 1)))
 
 ;; Sessions: the open files and windows are saved on exit, and C-c S
 ;; restores them, like the Neovim setup.

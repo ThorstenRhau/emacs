@@ -31,14 +31,12 @@
   (xref-show-xrefs-function #'consult-xref)
   (xref-show-definitions-function #'consult-xref))
 
-;; Dired: GNU ls from coreutils with directories first, else macOS ls.
-;; Deletions move to the macOS Trash.  C-x C-j jumps to the current
-;; file's directory; C-x C-q makes the listing editable like oil.nvim.
-(if (executable-find "gls")
-    (setopt insert-directory-program "gls"
-            dired-listing-switches "-alh --group-directories-first")
-  (setopt dired-listing-switches "-alh"))
-(setopt dired-dwim-target t
+;; Dired: GNU ls from coreutils with directories first.  Deletions move
+;; to the macOS Trash.  C-x C-j jumps to the current file's directory;
+;; C-x C-q makes the listing editable like oil.nvim.
+(setopt insert-directory-program "gls"
+        dired-listing-switches "-alh --group-directories-first"
+        dired-dwim-target t
         dired-kill-when-opening-new-dired-buffer t
         delete-by-moving-to-trash t
         wdired-allow-to-change-permissions t)

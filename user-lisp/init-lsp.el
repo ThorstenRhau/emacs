@@ -5,9 +5,8 @@
 ;; first use.  Eglot starts the Homebrew language servers that Eglot
 ;; already knows about, and for Python basedpyright and ruff together
 ;; through rass.  JSON files are checked against the SchemaStore
-;; schemas.  Flymake shows the diagnostics, and next to them the same
-;; linters as nvim-lint.  C-c c f runs the same formatters as
-;; conform.nvim.
+;; schemas.  Flymake shows the diagnostics, and next to them the output
+;; of external linters.  C-c c f runs the external formatters.
 
 ;;; Code:
 
@@ -74,7 +73,7 @@ Runs when a JSON file opens, before Eglot starts its server."
 
 (defun my-eglot-workspace-configuration (_server)
   "Return the settings that Eglot sends to every language server.
-basedpyright leaves organizing imports to ruff, as in the Neovim setup."
+basedpyright leaves organizing imports to ruff."
   `(:basedpyright (:disableOrganizeImports t
                    :analysis (:typeCheckingMode "standard"))
     :json (:schemas ,(my-json-schemas) :validate (:enable t))))
@@ -134,7 +133,7 @@ basedpyright leaves organizing imports to ruff, as in the Neovim setup."
     (json-ts-mode     "prettier" "--stdin-filepath" file)
     (yaml-ts-mode     "prettier" "--stdin-filepath" file)
     (toml-ts-mode     "tombi" "format" "--stdin-filename" file "-"))
-  "Formatter command per major mode, the same as in conform.nvim.
+  "Formatter command per major mode.
 The command reads the buffer on stdin and writes the result to stdout.
 The symbol `file' stands for the buffer's file name, which formatters
 use to find their configuration.")
@@ -180,7 +179,7 @@ The buffer is changed only if the formatter succeeds."
   '((lua-ts-mode      "selene" "--display-style" "quiet" "-")
     (markdown-ts-mode "markdownlint" "--stdin")
     (yaml-ts-mode     "yamllint" "--format" "parsable" "-"))
-  "Linter command per major mode, the same as in nvim-lint.
+  "Linter command per major mode.
 Ruff is not here: it runs as a language server through rass.
 The command reads the buffer on stdin and prints one problem per line
 as FILE:LINE[:COL][:] MESSAGE.  A message that starts with `error' or

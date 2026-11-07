@@ -1,10 +1,10 @@
 ;;; init-editor.el --- Editing defaults -*- lexical-binding: t -*-
 
 ;;; Commentary:
-;; Built-in options that match the Neovim setup: relative line numbers,
-;; cursor line, scroll margin, no wrapping in code, spaces for indent,
-;; EditorConfig, persistent history and cursor positions.  Also
-;; folding, spelling, sessions and a few helpers from the Neovim setup.
+;; Built-in options: relative line numbers, cursor line, scroll margin,
+;; no wrapping in code, spaces for indent, EditorConfig, persistent
+;; history and cursor positions.  Also folding, spelling, sessions and a
+;; few helpers.
 
 ;;; Code:
 
@@ -69,7 +69,7 @@
             (flyspell-mode 1)))
 
 ;; Sessions: the open files and windows are saved on exit, and C-c S
-;; restores them, like the Neovim setup.
+;; restores them.
 (setopt desktop-path (list user-emacs-directory))
 
 (defvar desktop-file-modtime)
@@ -77,7 +77,7 @@
 
 (defun my-desktop-save ()
   "Save the session to `user-emacs-directory', except in batch mode.
-Like Neovim's mksession!, the last Emacs to exit wins."
+With several Emacs instances running, the last one to exit wins."
   (unless noninteractive
     (require 'desktop)
     ;; `desktop-save' asks before it overwrites a session file that
@@ -109,7 +109,7 @@ Like Neovim's mksession!, the last Emacs to exit wins."
 
 (defun my-package-upgrade-all ()
   "Upgrade the packages from the archives and from Git.
-Also refresh the SchemaStore catalog, as schemastore.nvim does."
+Also refresh the SchemaStore catalog."
   (interactive)
   (package-upgrade-all t)
   (package-vc-upgrade-all)

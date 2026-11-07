@@ -39,8 +39,7 @@
   (global-corfu-mode)
   (corfu-popupinfo-mode))
 
-;; File names complete in code, prose and config files, like blink.cmp's
-;; path source.  `cape-file' answers only when the text at point
+;; File names complete in code, prose and config files.  `cape-file' answers only when the text at point
 ;; contains a / and names an existing directory, so it goes before
 ;; Eglot's completion.  Eglot adds that in the buffer, which runs before
 ;; any global function, so `cape-file' is added in the buffer too.

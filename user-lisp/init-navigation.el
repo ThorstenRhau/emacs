@@ -33,7 +33,7 @@
 
 ;; Dired: GNU ls from coreutils with directories first.  Deletions move
 ;; to the macOS Trash.  C-x C-j jumps to the current file's directory;
-;; C-x C-q makes the listing editable like oil.nvim.
+;; C-x C-q makes the listing editable, so renames are text edits.
 (setopt insert-directory-program "gls"
         dired-listing-switches "-alh --group-directories-first"
         dired-dwim-target t

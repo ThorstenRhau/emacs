@@ -1,9 +1,9 @@
 ;;; init-git.el --- Magit and change markers -*- lexical-binding: t -*-
 
 ;;; Commentary:
-;; Magit replaces Neogit (C-x g for status).  diff-hl replaces gitsigns:
-;; change markers in the margin, hunk navigation with C-x v [ and
-;; C-x v ], and C-x v * to show the hunk at point.  With `repeat-mode'
+;; Magit is the Git interface (C-x g for status).  diff-hl shows change
+;; markers in the margin, moves between hunks with C-x v [ and
+;; C-x v ], and C-x v * shows the hunk at point.  With `repeat-mode'
 ;; (init-editor), more [ and ] keep moving between hunks.  Magit's
 ;; C-c M-g menu has blame and the file's log.
 

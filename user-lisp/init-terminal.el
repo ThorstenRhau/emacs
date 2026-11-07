@@ -18,7 +18,11 @@
 ;; permission each time.  Paste from macOS with Cmd-V instead.
 (when (equal (getenv "TERM") "xterm-ghostty")
   (setopt xterm-extra-capabilities
-          '(modifyOtherKeys reportBackground setSelection)))
+          '(modifyOtherKeys reportBackground setSelection))
+  ;; Emacs 31 enables the mouse only on its allowlist of terminals,
+  ;; which leaves out Ghostty.  Shift-drag still uses Ghostty's own
+  ;; selection.
+  (xterm-mouse-mode 1))
 
 ;; Emacs 31 turns on `xterm-mouse-mode' in Ghostty by default.  Hold
 ;; Shift while dragging to use Ghostty's own selection instead.

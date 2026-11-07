@@ -48,13 +48,6 @@
 ;; their syntax nodes.
 (add-hook 'prog-mode-hook #'hs-minor-mode)
 
-;; Briefly highlight copied text, like vim.hl.on_yank.
-(defun my-pulse-copied (beg end &rest _)
-  "Highlight the text between BEG and END that was just copied."
-  (pulse-momentary-highlight-region beg end))
-
-(advice-add 'kill-ring-save :after #'my-pulse-copied)
-
 ;; Spelling with aspell: in code, comments and strings only.
 (setopt ispell-dictionary "en_US")
 

@@ -14,6 +14,10 @@
 ;; is missing, Emacs offers to build it (needs Xcode Command Line Tools).
 (setopt treesit-enabled-modes t)
 
+;; Level 4 adds function calls, properties, variables, operators and
+;; brackets, which level 3 (the default) leaves unhighlighted.
+(setopt treesit-font-lock-level 4)
+
 ;; Emacs 31 ships markdown-ts-mode as experimental and does not autoload
 ;; it or associate it with .md files.
 (autoload 'markdown-ts-mode "markdown-ts-mode" nil t)

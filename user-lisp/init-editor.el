@@ -18,7 +18,7 @@
         scroll-conservatively 101
         truncate-lines t                       ; nowrap
         display-line-numbers-type 'relative
-        display-line-numbers-width 3
+        display-line-numbers-width-start t
         vc-follow-symlinks t                   ; for Stow-managed dotfiles
         recentf-max-saved-items 200
         ;; Minor modes share one … in the mode line, except Flymake,

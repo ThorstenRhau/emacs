@@ -11,6 +11,10 @@
 (setopt xref-search-program 'ripgrep
         grep-use-headings t)
 
+;; Emacs parses rg output itself.  The shell's ripgrep config adds
+;; --column, which shifts Consult's and xref's match positions.
+(setenv "RIPGREP_CONFIG_PATH" nil)
+
 ;; Consult takes over the standard keys through remaps, so C-x b,
 ;; C-x p b, M-y, M-g g and M-g i keep working with preview.  Search
 ;; commands that have no standard key go under C-c s.

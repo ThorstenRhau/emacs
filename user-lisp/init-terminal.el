@@ -22,7 +22,13 @@
   ;; Emacs 31 enables the mouse only on its allowlist of terminals,
   ;; which leaves out Ghostty.  Shift-drag still uses Ghostty's own
   ;; selection.
-  (xterm-mouse-mode 1))
+  (xterm-mouse-mode 1)
+  ;; The wheel bindings are missing at start-up in the terminal, so
+  ;; scrolling reports "<wheel-down> is undefined".  Calling the mode
+  ;; adds them.  Tilt scrolling also binds <wheel-left> and <wheel-right>
+  ;; (sideways trackpad movement).
+  (setopt mouse-wheel-tilt-scroll nil)
+  (mouse-wheel-mode 1))
 
 ;; Emacs 31 turns on `xterm-mouse-mode' in Ghostty by default.  Hold
 ;; Shift while dragging to use Ghostty's own selection instead.

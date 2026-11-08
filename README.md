@@ -87,6 +87,7 @@ Standard Emacs keys, plus these under the user prefix `C-c`:
 | `C-c c l`    | Align by regexp              |
 | `C-c c d`    | Buffer diagnostics           |
 | `C-c c D`    | Project diagnostics          |
+| `C-c f f`    | Find file in project         |
 | `C-c f r`    | Recent files                 |
 | `C-c s l`    | Search lines in buffer       |
 | `C-c s r`    | Ripgrep in project           |

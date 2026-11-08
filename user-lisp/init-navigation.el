@@ -26,6 +26,7 @@
          ([remap yank-pop] . consult-yank-pop)
          ([remap goto-line] . consult-goto-line)
          ([remap imenu] . consult-imenu)
+         ("C-c f f" . consult-find)
          ("C-c f r" . consult-recent-file)
          ("C-c s l" . consult-line)
          ("C-c s r" . consult-ripgrep)

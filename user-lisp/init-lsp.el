@@ -147,7 +147,8 @@ basedpyright leaves organizing imports to ruff."
   :custom
   (flymake-show-diagnostics-at-end-of-line 'short)
   (flymake-margin-indicator-position 'right-margin)
-  :bind (:map flymake-mode-map
+  :bind (("C-c t d" . flymake-mode)
+         :map flymake-mode-map
          ("M-n" . flymake-goto-next-error)
          ("M-p" . flymake-goto-prev-error)
          ("C-c c d" . flymake-show-buffer-diagnostics)

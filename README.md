@@ -93,6 +93,9 @@ Standard Emacs keys, plus these under the user prefix `C-c`:
 | `C-c s r`    | Ripgrep in project           |
 | `C-c s o`    | Jump to outline heading      |
 | `C-c s i`    | Imenu across project buffers |
+| `C-c s d`    | Pick a buffer diagnostic     |
+| `C-c s D`    | Pick a project diagnostic    |
+| `C-c -`      | Directory of current file    |
 | `C-c @`      | Folding commands (hideshow)  |
 | `C-c &`      | Snippet commands (yasnippet) |
 | `C-c o`      | Open file in its macOS app   |
@@ -102,4 +105,5 @@ Standard Emacs keys, plus these under the user prefix `C-c`:
 | `C-c t w`    | Toggle word wrap             |
 | `C-c t l`    | Toggle line numbers          |
 | `C-c t h`    | Toggle inlay hints (Eglot)   |
+| `C-c t d`    | Toggle diagnostics (Flymake) |
 | `M-n`, `M-p` | Next and previous diagnostic |

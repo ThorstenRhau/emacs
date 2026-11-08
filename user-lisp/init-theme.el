@@ -12,10 +12,10 @@
 ;;; Code:
 
 (defun my-token-apply (appearance)
-  "Load the Token Meridian variant for APPEARANCE, `light' or `dark'."
+  "Load the Token variant for APPEARANCE, `light' or `dark'."
   (let ((theme (if (eq appearance 'light)
-                   'token-meridian-light
-                 'token-meridian-dark)))
+                   'token-light
+                 'token-dark)))
     (unless (memq theme custom-enabled-themes)
       (mapc #'disable-theme custom-enabled-themes)
       (load-theme theme t))))

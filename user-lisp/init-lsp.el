@@ -74,6 +74,28 @@ Runs when a JSON file opens, before Eglot starts its server."
 (add-hook 'json-ts-mode-hook #'my-json-schemas-ensure)
 
 (declare-function eglot-alternatives "eglot")
+(declare-function eglot-inlay-hints-mode "eglot")
+(defvar eglot-inlay-hints-mode)
+(defvar eglot--outstanding-inlay-hints-last-region)
+
+(defun my-eglot-inlay-hints-off ()
+  "Turn inlay hints off, which Eglot turns on in every buffer it manages.
+Runs from `eglot-managed-mode-hook', right after Eglot enables them."
+  (eglot-inlay-hints-mode -1))
+
+(add-hook 'eglot-managed-mode-hook #'my-eglot-inlay-hints-off)
+
+(defun my-eglot-toggle-inlay-hints ()
+  "Toggle Eglot inlay hints in this buffer and show them right away.
+Eglot paints hints from jit-lock and skips the region it painted last,
+so turning the mode back on alone shows nothing."
+  (interactive)
+  (eglot-inlay-hints-mode 'toggle)
+  (when eglot-inlay-hints-mode
+    ;; shortcut: resets an Eglot internal.  Drop this once Eglot clears
+    ;; it when the mode turns off.
+    (setq eglot--outstanding-inlay-hints-last-region nil)
+    (jit-lock-refontify)))
 
 (defun my-eglot-workspace-configuration (_server)
   "Return the settings that Eglot sends to every language server.
@@ -90,11 +112,13 @@ basedpyright leaves organizing imports to ruff."
           python-ts-mode
           toml-ts-mode
           yaml-ts-mode) . eglot-ensure)
+  ;; Inlay hints start off (`my-eglot-inlay-hints-off'); C-c t h shows them.
   :bind (:map eglot-mode-map
          ("C-c c a" . eglot-code-actions)
          ("C-c c r" . eglot-rename)
          ("C-c c i" . eglot-find-implementation)
-         ("C-c c t" . eglot-find-typeDefinition))
+         ("C-c c t" . eglot-find-typeDefinition)
+         ("C-c t h" . my-eglot-toggle-inlay-hints))
   :custom
   (eglot-autoshutdown t)
   (eglot-events-buffer-config '(:size 0 :format full)) ; no event log

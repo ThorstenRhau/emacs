@@ -100,4 +100,5 @@ Standard Emacs keys, plus these under the user prefix `C-c`:
 | `C-c t s`    | Toggle spelling              |
 | `C-c t w`    | Toggle word wrap             |
 | `C-c t l`    | Toggle line numbers          |
+| `C-c t h`    | Toggle inlay hints (Eglot)   |
 | `M-n`, `M-p` | Next and previous diagnostic |

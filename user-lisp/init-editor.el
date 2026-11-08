@@ -9,7 +9,6 @@
 ;;; Code:
 
 (setopt inhibit-startup-screen t
-        ring-bell-function #'ignore
         use-short-answers t
         indent-tabs-mode nil                   ; expandtab
         require-final-newline t

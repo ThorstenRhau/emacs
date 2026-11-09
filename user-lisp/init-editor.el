@@ -15,6 +15,7 @@
         sentence-end-double-space nil
         scroll-margin 10                       ; scrolloff
         scroll-conservatively 101
+        scroll-preserve-screen-position t      ; cursor keeps its screen row
         truncate-lines t                       ; nowrap
         display-line-numbers-type 'relative
         display-line-numbers-width-start t
@@ -97,6 +98,17 @@ With several Emacs instances running, the last one to exit wins."
           backup-by-copying t
           create-lockfiles nil))
 
+;; C-v and M-v scroll half a window, like C-d and C-u in Vim.
+(defun my-half-page-down ()
+  "Scroll the text up by half the window height."
+  (interactive)
+  (scroll-up-command (/ (window-body-height) 2)))
+
+(defun my-half-page-up ()
+  "Scroll the text down by half the window height."
+  (interactive)
+  (scroll-down-command (/ (window-body-height) 2)))
+
 (defun my-open-externally ()
   "Open the current file with the default macOS application."
   (interactive)
@@ -114,6 +126,8 @@ Also refresh the SchemaStore catalog."
   (package-vc-upgrade-all)
   (my-json-schemas-update))
 
+(keymap-global-set "C-v" #'my-half-page-down)
+(keymap-global-set "M-v" #'my-half-page-up)
 (keymap-global-set "C-c o" #'my-open-externally)
 (keymap-global-set "C-c c l" #'align-regexp)
 (keymap-global-set "C-c l" #'my-package-upgrade-all)

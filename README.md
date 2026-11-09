@@ -107,3 +107,4 @@ Standard Emacs keys, plus these under the user prefix `C-c`:
 | `C-c t h`    | Toggle inlay hints (Eglot)   |
 | `C-c t d`    | Toggle diagnostics (Flymake) |
 | `M-n`, `M-p` | Next and previous diagnostic |
+| `C-v`, `M-v` | Scroll half a window         |
